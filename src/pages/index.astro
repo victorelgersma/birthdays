@@ -1,16 +1,39 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
+import { pb } from '../lib/pocketbase';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Birthday Tracker">
+  <main class="container mx-auto px-4 py-8" id="mainContent">
+    <div class="flex justify-between items-center mb-8 hidden" id="welcomeMessage">
+      <h1 class="text-3xl font-bold">Welcome, <span id="userEmail"></span>!</h1>
+      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        Logout
+      </button>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  import { pb } from '../lib/pocketbase';
+  
+  // Check auth on page load
+  if (!pb.authStore.isValid) {
+    window.location.href = '/login';
+  } else {
+    // Show welcome message and update email
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    const userEmail = document.getElementById('userEmail');
+    if (welcomeMessage && userEmail && pb.authStore.model) {
+      welcomeMessage.classList.remove('hidden');
+      userEmail.textContent = pb.authStore.model.email;
+    }
+  }
+
+  // Handle logout
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    pb.authStore.clear();
+    window.location.href = '/login';
+  });
+</script>
+
