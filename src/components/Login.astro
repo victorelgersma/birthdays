@@ -1,45 +1,91 @@
 ---
-import { login } from '../utils/pocketbase';
+import { login } from '../utils/pocketbase'
 ---
 
-<div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+<div
+  id="loginView"
+  class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md"
+>
   <h2 class="text-2xl font-bold mb-6">Login</h2>
   <form id="loginForm" class="space-y-4">
     <div>
       <label for="email" class="block text-gray-700">Email:</label>
-      <input type="email" id="email" name="email" required class="w-full border p-2 rounded" />
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        class="w-full border p-2 rounded"
+      />
     </div>
     <div>
       <label for="password" class="block text-gray-700">Password:</label>
-      <input type="password" id="password" name="password" required class="w-full border p-2 rounded" />
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        class="w-full border p-2 rounded"
+      />
     </div>
-    <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-      Login
-    </button>
+    <div class="flex items-center justify-between">
+      <button
+        type="submit"
+        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+      >
+        Login
+      </button>
+      <button
+        type="button"
+        id="showResetBtn"
+        class="text-sm text-blue-500 hover:underline"
+      >
+        Forgot Password?
+      </button>
+    </div>
   </form>
+  <p class="mt-4 text-center text-gray-600">
+    Don't have an account?
+    <button id="showRegisterBtn" class="text-blue-500 hover:underline"
+      >Register</button
+    >
+  </p>
 </div>
 
 <script>
-  import { pb } from '../lib/pocketbase';
+  import { pb } from '../lib/pocketbase'
 
-  const form = document.getElementById('loginForm');
+  const form = document.getElementById('loginForm')
   form?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    console.log('Email:', formData.get('email'));
-    console.log('Password:', formData.get('password'));
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+    console.log('Email:', formData.get('email'))
+    console.log('Password:', formData.get('password'))
     try {
-        const userData = await pb.collection('users').authWithPassword(formData.get('email'), formData.get('password'));
-     
-        // PocketBase automatically persists the auth state
-        console.log(pb.authStore.isValid);
-        console.log(pb.authStore.token);
-        console.log(pb.authStore.record.id);
-        window.location.href = '/';
+      const userData = await pb
+        .collection('users')
+        .authWithPassword(formData.get('email'), formData.get('password'))
 
+      // PocketBase automatically persists the auth state
+      console.log(pb.authStore.isValid)
+      console.log(pb.authStore.token)
+      console.log(pb.authStore.record.id)
+      window.location.href = '/'
     } catch (err) {
-      console.error('Login failed:', err);
-      alert('Login failed. Please check your credentials.');
+      console.error('Login failed:', err)
+      alert('Login failed. Please check your credentials.')
     }
-  });
+  })
+
+  // Handle switch to register view
+  document.getElementById('showRegisterBtn')?.addEventListener('click', () => {
+    document.getElementById('registerView')?.classList.remove('hidden')
+    document.getElementById('loginView')?.classList.add('hidden')
+  })
+
+  // Handle switch to password reset view
+  document.getElementById('showResetBtn')?.addEventListener('click', () => {
+    document.getElementById('resetView')?.classList.remove('hidden')
+    document.getElementById('loginView')?.classList.add('hidden')
+  })
 </script>

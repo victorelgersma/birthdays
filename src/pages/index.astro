@@ -1,23 +1,29 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AddBirthday from '../components/AddBirthday.astro';
-import { pb } from '../lib/pocketbase';
+import Layout from '../layouts/Layout.astro'
+import AddBirthday from '../components/AddBirthday.astro'
+import { pb } from '../lib/pocketbase'
 ---
 
 <Layout title="Birthday Tracker">
   <main class="container mx-auto px-4 py-8" id="mainContent">
-    <div class="flex justify-between items-center mb-8 hidden" id="welcomeMessage">
-      <h1 class="text-3xl font-bold">Welcome, <span id="userEmail"></span>!</h1>
-      <button id="logoutBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+    <div
+      class="flex justify-between items-center mb-8 hidden"
+      id="welcomeMessage"
+    >
+      <h1 class="text-3xl font-bold">Welcome, <span id="userName"></span>!</h1>
+      <button
+        id="logoutBtn"
+        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+      >
         Logout
       </button>
     </div>
-    
+
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-semibold">Birthdays</h2>
       <AddBirthday />
     </div>
-    
+
     <div id="birthdayList" class="hidden">
       <table class="min-w-full">
         <tbody id="birthdayItems"></tbody>
@@ -27,8 +33,8 @@ import { pb } from '../lib/pocketbase';
 </Layout>
 
 <script>
-  import { pb } from '../lib/pocketbase';
-  
+  import { pb } from '../lib/pocketbase'
+
   const months = {
     1: 'January',
     2: 'February',
@@ -41,100 +47,101 @@ import { pb } from '../lib/pocketbase';
     9: 'September',
     10: 'October',
     11: 'November',
-    12: 'December'
-  };
+    12: 'December',
+  }
 
   // Helper function to get ordinal suffix for day
   const getOrdinalSuffix = (day) => {
-    const j = day % 10;
-    const k = day % 100;
-    if (j == 1 && k != 11) return day + "st";
-    if (j == 2 && k != 12) return day + "nd";
-    if (j == 3 && k != 13) return day + "rd";
-    return day + "th";
-  };
+    const j = day % 10
+    const k = day % 100
+    if (j == 1 && k != 11) return day + 'st'
+    if (j == 2 && k != 12) return day + 'nd'
+    if (j == 3 && k != 13) return day + 'rd'
+    return day + 'th'
+  }
 
   // Add delete handler
   const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this birthday?')) {
       try {
-        await pb.collection('birthdays').delete(id);
+        await pb.collection('birthdays').delete(id)
         // Remove the row from the table
-        document.getElementById(`birthday-${id}`)?.remove();
+        document.getElementById(`birthday-${id}`)?.remove()
       } catch (err) {
-        console.error('Error deleting birthday:', err);
-        alert('Failed to delete birthday. Please try again.');
+        console.error('Error deleting birthday:', err)
+        alert('Failed to delete birthday. Please try again.')
       }
     }
-  };
+  }
 
   // Check auth on page load
   if (!pb.authStore.isValid) {
-    window.location.href = '/login';
+    window.location.href = '/login'
   } else {
-    // Show welcome message and update email
-    const welcomeMessage = document.getElementById('welcomeMessage');
-    const userEmail = document.getElementById('userEmail');
-    if (welcomeMessage && userEmail && pb.authStore.model) {
-      welcomeMessage.classList.remove('hidden');
-      userEmail.textContent = pb.authStore.model.email;
+    // Show welcome message and update username
+    const welcomeMessage = document.getElementById('welcomeMessage')
+    const userName = document.getElementById('userName')
+    if (welcomeMessage && userName && pb.authStore.model) {
+      welcomeMessage.classList.remove('hidden')
+      userName.textContent = pb.authStore.model.username
     }
 
     // Fetch and display birthdays
     const fetchBirthdays = async () => {
       try {
         const records = await pb.collection('birthdays').getList(1, 50, {
-          sort: 'month,day'
-        });
+          sort: 'month,day',
+        })
 
-        const birthdayItems = document.getElementById('birthdayItems');
+        const birthdayItems = document.getElementById('birthdayItems')
         if (birthdayItems) {
-          records.items.forEach(record => {
-            const tr = document.createElement('tr');
-            tr.id = `birthday-${record.id}`;
-            tr.className = 'border-b hover:bg-gray-50';
-            
-            const dateCell = document.createElement('td');
-            dateCell.className = 'py-2 px-4 text-gray-600';
-            const formattedDate = `${months[record.month]} ${getOrdinalSuffix(record.day)}`;
-            dateCell.textContent = formattedDate;
+          records.items.forEach((record) => {
+            const tr = document.createElement('tr')
+            tr.id = `birthday-${record.id}`
+            tr.className = 'border-b hover:bg-gray-50'
 
-            const nameCell = document.createElement('td');
-            nameCell.className = 'py-2 px-4 font-medium';
-            nameCell.textContent = record.name;
+            const dateCell = document.createElement('td')
+            dateCell.className = 'py-2 px-4 text-gray-600'
+            const formattedDate = `${months[record.month]} ${getOrdinalSuffix(record.day)}`
+            dateCell.textContent = formattedDate
 
-            const actionCell = document.createElement('td');
-            actionCell.className = 'py-2 px-4 text-right';
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'text-red-600 hover:text-red-800';
+            const nameCell = document.createElement('td')
+            nameCell.className = 'py-2 px-4 font-medium'
+            nameCell.textContent = record.name
+
+            const actionCell = document.createElement('td')
+            actionCell.className = 'py-2 px-4 text-right'
+            const deleteButton = document.createElement('button')
+            deleteButton.className = 'text-red-600 hover:text-red-800'
             deleteButton.innerHTML = `
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
-            `;
-            deleteButton.addEventListener('click', () => handleDelete(record.id));
-            actionCell.appendChild(deleteButton);
+            `
+            deleteButton.addEventListener('click', () =>
+              handleDelete(record.id)
+            )
+            actionCell.appendChild(deleteButton)
 
-            tr.appendChild(dateCell);
-            tr.appendChild(nameCell);
-            tr.appendChild(actionCell);
-            birthdayItems.appendChild(tr);
-          });
-          document.getElementById('birthdayList').classList.remove('hidden');
+            tr.appendChild(dateCell)
+            tr.appendChild(nameCell)
+            tr.appendChild(actionCell)
+            birthdayItems.appendChild(tr)
+          })
+          document.getElementById('birthdayList').classList.remove('hidden')
         }
       } catch (err) {
-        console.error('Error fetching birthdays:', err);
+        console.error('Error fetching birthdays:', err)
       }
-    };
+    }
 
-    fetchBirthdays();
+    fetchBirthdays()
   }
 
   // Handle logout
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
-    pb.authStore.clear();
-    window.location.href = '/login';
-  });
+    pb.authStore.clear()
+    window.location.href = '/login'
+  })
 </script>
-

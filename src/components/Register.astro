@@ -1,0 +1,144 @@
+---
+import { pb } from '../lib/pocketbase'
+---
+
+<div class="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-2xl font-bold mb-6">Register</h2>
+  <form id="registerForm" class="space-y-4">
+    <div>
+      <label for="username" class="block text-gray-700">Username:</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        required
+        class="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label for="email" class="block text-gray-700">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        class="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label for="password" class="block text-gray-700">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+        class="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div>
+      <label for="passwordConfirm" class="block text-gray-700"
+        >Confirm Password:</label
+      >
+      <input
+        type="password"
+        id="passwordConfirm"
+        name="passwordConfirm"
+        required
+        class="w-full border p-2 rounded focus:ring-blue-500 focus:border-blue-500"
+      />
+    </div>
+    <div id="passwordError" class="text-red-500 text-sm mt-1 hidden">
+      Passwords do not match
+    </div>
+    <button
+      type="submit"
+      class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+    >
+      Register
+    </button>
+  </form>
+  <p class="mt-4 text-center text-gray-600">
+    Already have an account?
+    <button id="showLoginBtn" class="text-blue-500 hover:underline"
+      >Login</button
+    >
+  </p>
+</div>
+
+<script>
+  import { pb } from '../lib/pocketbase'
+
+  const form = document.getElementById('registerForm')
+  const password = document.getElementById('password') as HTMLInputElement
+  const passwordConfirm = document.getElementById(
+    'passwordConfirm'
+  ) as HTMLInputElement
+  const submitButton = form?.querySelector(
+    'button[type="submit"]'
+  ) as HTMLButtonElement
+
+  // Add password match validation
+  const validatePasswords = () => {
+    const errorDiv = document.getElementById('passwordError')
+    if (password?.value && passwordConfirm?.value) {
+      if (password.value !== passwordConfirm.value) {
+        passwordConfirm.setCustomValidity('Passwords do not match')
+        submitButton.disabled = true
+        submitButton.classList.add('opacity-50', 'cursor-not-allowed')
+        errorDiv?.classList.remove('hidden')
+      } else {
+        passwordConfirm.setCustomValidity('')
+        submitButton.disabled = false
+        submitButton.classList.remove('opacity-50', 'cursor-not-allowed')
+        errorDiv?.classList.add('hidden')
+      }
+    }
+  }
+
+  // Add event listeners for real-time validation
+  password?.addEventListener('input', validatePasswords)
+  passwordConfirm?.addEventListener('input', validatePasswords)
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault()
+    const formData = new FormData(e.target as HTMLFormElement)
+
+    try {
+      const data = {
+        username: formData.get('username'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        passwordConfirm: formData.get('passwordConfirm'),
+        emailVisibility: true,
+      }
+
+      const record = await pb.collection('users').create(data)
+
+      // Auto login after registration
+      await pb
+        .collection('users')
+        .authWithPassword(data.email as string, data.password as string)
+
+      window.location.href = '/'
+    } catch (error) {
+      console.error('Registration failed:', error)
+
+      // Handle specific error messages from PocketBase
+      if (error.response && error.response.data) {
+        if (error.response.data.email) {
+          alert('This email is already registered. Try logging in instead.')
+        } else {
+          alert('An error occurred: ' + JSON.stringify(error.response.data))
+        }
+      } else {
+        alert('An unexpected error occurred. Please try again.')
+      }
+    }
+  })
+
+  // Handle switch to login view
+  document.getElementById('showLoginBtn')?.addEventListener('click', () => {
+    document.getElementById('loginView')?.classList.remove('hidden')
+    document.getElementById('registerView')?.classList.add('hidden')
+  })
+</script>

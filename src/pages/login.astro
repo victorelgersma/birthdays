@@ -1,8 +1,18 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Login from '../components/Login.astro';
+import Layout from '../layouts/Layout.astro'
+import Login from '../components/Login.astro'
+import Register from '../components/Register.astro'
+import PasswordReset from '../components/PasswordReset.astro'
 ---
 
 <Layout title="Login - Birthday Tracker">
-  <Login />
+  <div id="loginView">
+    <Login />
+  </div>
+  <div id="registerView" class="hidden">
+    <Register />
+  </div>
+  <div id="resetView" class="hidden">
+    <PasswordReset />
+  </div>
 </Layout>
