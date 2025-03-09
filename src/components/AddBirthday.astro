@@ -20,8 +20,34 @@
           
           <div>
             <label class="block text-sm font-medium text-gray-700">Birthday</label>
-            <input type="date" name="birthday" required
-              class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <div class="grid grid-cols-2 gap-4">
+              <select name="month" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <option value="">Month</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+              </select>
+              <input type="number" name="day" required min="1" max="31" placeholder="Day"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="flex items-center space-x-2">
+              <input type="checkbox" id="includeYear" name="includeYear" class="rounded text-blue-500">
+              <span class="text-sm text-gray-700">Include year</span>
+            </label>
+            <input type="number" id="yearInput" name="year" placeholder="Year" disabled
+              class="mt-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100">
           </div>
 
           <div class="flex justify-end space-x-3">
@@ -47,45 +73,43 @@
   const openBtn = document.getElementById('openModalBtn');
   const closeBtn = document.getElementById('closeModalBtn');
   const form = document.getElementById('addBirthdayForm');
+  const includeYearCheckbox = document.getElementById('includeYear');
+  const yearInput = document.getElementById('yearInput');
 
-  // Open modal
-  openBtn?.addEventListener('click', () => {
-    modal?.classList.remove('hidden');
-  });
-
-  // Close modal
-  closeBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden');
-  });
-
-  // Close on outside click
-  modal?.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.add('hidden');
+  // Toggle year input
+  includeYearCheckbox?.addEventListener('change', (e) => {
+    if (yearInput) {
+      yearInput.disabled = !(e.target as HTMLInputElement).checked;
+      if (yearInput.disabled) {
+        yearInput.value = '';
+      }
     }
+  });
+
+  // Open/Close modal handlers
+  openBtn?.addEventListener('click', () => modal?.classList.remove('hidden'));
+  closeBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.add('hidden');
   });
 
   // Handle form submission
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    const date = new Date(formData.get('birthday') as string);
-
+    
     try {
       const data = {
         name: formData.get('name'),
-        day: date.getDate(),
-        month: date.getMonth() + 1,
-        year: date.getFullYear(),
+        month: parseInt(formData.get('month') as string),
+        day: parseInt(formData.get('day') as string),
+        year: formData.get('includeYear') ? parseInt(formData.get('year') as string) : null,
         user: pb.authStore.model?.id
       };
 
       await pb.collection('birthdays').create(data);
-      
-      // Close modal and refresh birthday list
       modal?.classList.add('hidden');
-      window.location.reload(); // We'll improve this later with proper state management
-      
+      window.location.reload();
     } catch (err) {
       console.error('Error adding birthday:', err);
       alert('Failed to add birthday. Please try again.');
