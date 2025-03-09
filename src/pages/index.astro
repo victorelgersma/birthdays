@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AddBirthday from '../components/AddBirthday.astro';
 import { pb } from '../lib/pocketbase';
 ---
 
@@ -11,12 +12,55 @@ import { pb } from '../lib/pocketbase';
         Logout
       </button>
     </div>
+    
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-semibold">Birthdays</h2>
+      <AddBirthday />
+    </div>
+    
+    <div id="birthdayList" class="hidden">
+      <h2 class="text-2xl font-semibold mb-4">Birthdays</h2>
+      <table class="min-w-full">
+        <thead>
+          <tr class="bg-gray-100">
+            <th class="text-left py-2 px-4">Name</th>
+            <th class="text-left py-2 px-4">Birthday</th>
+          </tr>
+        </thead>
+        <tbody id="birthdayItems"></tbody>
+      </table>
+    </div>
   </main>
 </Layout>
 
 <script>
   import { pb } from '../lib/pocketbase';
   
+  const months = {
+    1: 'January',
+    2: 'February',
+    3: 'March',
+    4: 'April',
+    5: 'May',
+    6: 'June',
+    7: 'July',
+    8: 'August',
+    9: 'September',
+    10: 'October',
+    11: 'November',
+    12: 'December'
+  };
+
+  // Helper function to get ordinal suffix for day
+  const getOrdinalSuffix = (day) => {
+    const j = day % 10;
+    const k = day % 100;
+    if (j == 1 && k != 11) return day + "st";
+    if (j == 2 && k != 12) return day + "nd";
+    if (j == 3 && k != 13) return day + "rd";
+    return day + "th";
+  };
+
   // Check auth on page load
   if (!pb.authStore.isValid) {
     window.location.href = '/login';
@@ -28,6 +72,41 @@ import { pb } from '../lib/pocketbase';
       welcomeMessage.classList.remove('hidden');
       userEmail.textContent = pb.authStore.model.email;
     }
+
+    // Fetch and display birthdays
+    const fetchBirthdays = async () => {
+      try {
+        const records = await pb.collection('birthdays').getList(1, 50, {
+          sort: 'month,day'
+        });
+
+        const birthdayItems = document.getElementById('birthdayItems');
+        if (birthdayItems) {
+          records.items.forEach(record => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b hover:bg-gray-50';
+            
+            const nameCell = document.createElement('td');
+            nameCell.className = 'py-2 px-4';
+            nameCell.textContent = record.name;
+
+            const dateCell = document.createElement('td');
+            dateCell.className = 'py-2 px-4 text-gray-600';
+            const formattedDate = `${months[record.month]} ${getOrdinalSuffix(record.day)}`;
+            dateCell.textContent = formattedDate;
+
+            tr.appendChild(nameCell);
+            tr.appendChild(dateCell);
+            birthdayItems.appendChild(tr);
+          });
+          document.getElementById('birthdayList').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error fetching birthdays:', err);
+      }
+    };
+
+    fetchBirthdays();
   }
 
   // Handle logout
