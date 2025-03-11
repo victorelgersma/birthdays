@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import AddBirthday from '../components/AddBirthday.astro';
 import { BirthdayList } from '../components/BirthdayList';
+import { BackupControls } from '../components/BackupControls';
+
 ---
 
 <Layout title="Birthday Tracker">
@@ -12,5 +14,6 @@ import { BirthdayList } from '../components/BirthdayList';
     </div>
 
     <BirthdayList client:load />
-  </main>
+    <BackupControls client:load />
+    </main>
 </Layout>
