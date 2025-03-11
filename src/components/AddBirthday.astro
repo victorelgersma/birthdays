@@ -67,14 +67,12 @@
 </div>
 
 <script>
-  import { pb } from '../lib/pocketbase';
-
   const modal = document.getElementById('birthdayModal');
   const openBtn = document.getElementById('openModalBtn');
   const closeBtn = document.getElementById('closeModalBtn');
   const form = document.getElementById('addBirthdayForm');
   const includeYearCheckbox = document.getElementById('includeYear');
-  const yearInput = document.getElementById('yearInput');
+  const yearInput = document.getElementById('yearInput') as HTMLInputElement;
 
   // Toggle year input
   includeYearCheckbox?.addEventListener('change', (e) => {
@@ -86,33 +84,64 @@
     }
   });
 
-  // Open/Close modal handlers
-  openBtn?.addEventListener('click', () => modal?.classList.remove('hidden'));
-  closeBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
+  // Modal controls
+  openBtn?.addEventListener('click', () => {
+    modal?.classList.remove('hidden');
+  });
+
+  closeBtn?.addEventListener('click', () => {
+    modal?.classList.add('hidden');
+    form?.reset();
+  });
+
+  // Close on outside click
   modal?.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.add('hidden');
+    if (e.target === modal) {
+      modal.classList.add('hidden');
+      form?.reset();
+    }
   });
 
   // Handle form submission
-  form?.addEventListener('submit', async (e) => {
+  form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     
-    try {
-      const data = {
-        name: formData.get('name'),
-        month: parseInt(formData.get('month') as string),
-        day: parseInt(formData.get('day') as string),
-        year: formData.get('includeYear') ? parseInt(formData.get('year') as string) : null,
-        user: pb.authStore.model?.id
-      };
+    const name = formData.get('name') as string;
+    const month = parseInt(formData.get('month') as string);
+    const day = parseInt(formData.get('day') as string);
+    
+    // Create birthday object
+    const birthday = {
+      month,
+      day,
+      ...(formData.get('includeYear') && {
+        year: parseInt(formData.get('year') as string)
+      })
+    };
 
-      await pb.collection('birthdays').create(data);
+    try {
+      // Get existing birthdays
+      const stored = localStorage.getItem('birthdays');
+      const birthdays = stored ? JSON.parse(stored) : {};
+      
+      // Add new birthday
+      birthdays[name] = birthday;
+      
+      // Save back to localStorage
+      localStorage.setItem('birthdays', JSON.stringify(birthdays));
+      
+      // Close modal and reset form
       modal?.classList.add('hidden');
+      form.reset();
+      
+      // Refresh the page to show new birthday
+      // In a more sophisticated app, we'd use events or state management
       window.location.reload();
-    } catch (err) {
-      console.error('Error adding birthday:', err);
-      alert('Failed to add birthday. Please try again.');
+    } catch (error) {
+      console.error('Failed to save birthday:', error);
+      alert('Failed to save birthday. Please try again.');
     }
   });
 </script>
+
