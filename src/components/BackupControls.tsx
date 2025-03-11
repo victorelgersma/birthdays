@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 export function BackupControls() {
   const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDownload = () => {
     try {
@@ -24,14 +25,8 @@ export function BackupControls() {
     }
   };
 
-  const handleDrop = async (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-
+  const handleFileSelect = async (file: File) => {
     try {
-      const file = e.dataTransfer?.files[0];
-      if (!file) return;
-
       const text = await file.text();
       const birthdays = JSON.parse(text);
 
@@ -54,6 +49,22 @@ export function BackupControls() {
     }
   };
 
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer?.files[0];
+    if (file) {
+      await handleFileSelect(file);
+    }
+  };
+
+  const handleFileInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await handleFileSelect(file);
+    }
+  };
+
   return (
     <div className="mt-8 flex items-center space-x-4 text-sm">
       <button
@@ -66,7 +77,16 @@ export function BackupControls() {
         Backup to file
       </button>
 
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileInput}
+        accept=".json"
+        className="hidden"
+      />
+
       <div
+        onClick={() => fileInputRef.current?.click()}
         onDragOver={(e) => {
           e.preventDefault();
           setIsDragging(true);
