@@ -9,6 +9,7 @@ A single source of truth for birthdays, namedays, and other events that you pref
 - [ ] refactor AddBirthdayComponent into a React component
 - [ ] allow user to edit birthday names and dates
 - [ ] when I restore from file I should get message saying "restored" and redirect to the homepage
+- [ ] display year if given
 - [ ] add a little arrow to point to the "Add birthday" when there are no birthdays
 - [ ] the modal should still allow you to see a little bit of the background
 - [ ] I should be able to drag the json file onto the screen and it will just add the birthdays
