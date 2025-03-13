@@ -1,73 +1,104 @@
-import { useEffect, useState } from 'react';
-import { getOrdinalSuffix, months } from '../lib/constants';
+import { useEffect, useState } from 'react'
+import { getOrdinalSuffix, months } from '../lib/constants'
 
 interface Birthday {
-  month: number;
-  day: number;
-  year?: number;
+  month: number
+  day: number
+  year?: number
 }
 
 type BirthdayMap = {
-  [name: string]: Birthday;
+  [name: string]: Birthday
+}
+
+// Group birthdays by month
+type GroupedBirthdays = {
+  [month: number]: Array<{ name: string; day: number }>
 }
 
 export function BirthdayList() {
-  const [birthdays, setBirthdays] = useState<BirthdayMap>({});
+  const [birthdays, setBirthdays] = useState<BirthdayMap>({})
 
   useEffect(() => {
-    const stored = localStorage.getItem('birthdays');
+    const stored = localStorage.getItem('birthdays')
     if (stored) {
-      setBirthdays(JSON.parse(stored));
+      setBirthdays(JSON.parse(stored))
     }
-  }, []);
+  }, [])
 
   const handleDelete = (name: string) => {
     if (confirm('Are you sure you want to delete this birthday?')) {
-      const newBirthdays = { ...birthdays };
-      delete newBirthdays[name];
-      localStorage.setItem('birthdays', JSON.stringify(newBirthdays));
-      setBirthdays(newBirthdays);
+      const newBirthdays = { ...birthdays }
+      delete newBirthdays[name]
+      localStorage.setItem('birthdays', JSON.stringify(newBirthdays))
+      setBirthdays(newBirthdays)
     }
-  };
+  }
 
-  // Sort entries for display
-  const sortedEntries = Object.entries(birthdays)
-    .sort(([, a], [, b]) => {
-      if (a.month === b.month) {
-        return a.day - b.day;
-      }
-      return a.month - b.month;
-    });
+  // Group birthdays by month
+  const groupedBirthdays: GroupedBirthdays = {}
+
+  Object.entries(birthdays).forEach(([name, { month, day }]) => {
+    if (!groupedBirthdays[month]) {
+      groupedBirthdays[month] = []
+    }
+    groupedBirthdays[month].push({ name, day })
+  })
+
+  // Sort each month's birthdays by day
+  Object.values(groupedBirthdays).forEach((daysArray) => {
+    daysArray.sort((a, b) => a.day - b.day)
+  })
 
   return (
     <div className="min-w-full">
-      <table className="min-w-full">
-        <tbody>
-          {sortedEntries.map(([name, { month, day }]) => (
-            <tr key={name} className="border-b hover:bg-gray-50">
-              <td className="py-2 px-4 text-gray-600">
-                {months[month]} {getOrdinalSuffix(day)}
-              </td>
-              <td className="py-2 px-4 font-medium">{name}</td>
-              <td className="py-2 px-2 text-right">
-                <button
-                  onClick={() => handleDelete(name)}
-                  className="text-red-600 size-12 hover:text-red-800"
+      {Object.entries(groupedBirthdays)
+        .sort(([monthA], [monthB]) => parseInt(monthA) - parseInt(monthB))
+        .map(([month, daysArray]) => (
+          <div key={month} className="mb-6">
+            <h2 className="text-xl font-bold text-gray-700 border-b pb-1 mb-2">
+              {months[parseInt(month)]}
+            </h2>
+            <dl className="pl-4">
+              {daysArray.map(({ name, day }) => (
+                <div
+                  key={name}
+                  className="flex items-center py-2 hover:bg-gray-50 rounded"
                 >
-                  <svg className="size-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                    />
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  <dt className="w-16 text-gray-600 font-medium">
+                    {getOrdinalSuffix(day)}
+                  </dt>
+                  <dd className="flex-grow">{name}</dd>
+                  <button
+                    onClick={() => handleDelete(name)}
+                    className="text-red-600 size-10 hover:text-red-800"
+                    aria-label={`Delete ${name}'s birthday`}
+                  >
+                    <svg
+                      className="size-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </dl>
+          </div>
+        ))}
+
+      {Object.keys(groupedBirthdays).length === 0 && (
+        <div className="text-center py-8 text-gray-500">
+          No birthdays added yet. Add your first one!
+        </div>
+      )}
     </div>
-  );
+  )
 }
