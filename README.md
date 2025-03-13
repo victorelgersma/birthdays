@@ -5,11 +5,11 @@ A single source of truth for birthdays, namedays, and other events that you pref
 
 ## To do
 
-- [ ] improve padding in Add Birthday component
+- [x] improve padding in Add Birthday component
+- [ ] refactor AddBirthdayComponent into a React component
 - [ ] allow user to edit birthday names and dates
 - [ ] when I restore from file I should get message saying "restored" and redirect to the homepage
 - [ ] add a little arrow to point to the "Add birthday" when there are no birthdays
-- [ ] don't show backup button when there are no birthdays
 - [ ] the modal should still allow you to see a little bit of the background
 - [ ] I should be able to drag the json file onto the screen and it will just add the birthdays
 - [ ] I should be able to change the title from "Birthday Sanity" to whatever I want it to be (it will keep it in local Storage)
