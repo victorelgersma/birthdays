@@ -149,7 +149,6 @@ export function BirthdayList() {
                         } font-medium`}
                       >
                         {getOrdinalSuffix(day)}
-                        {isTodaysBirthday && ' 🎂'}
                       </dt>
                       <dd
                         className={`flex-grow ${
@@ -157,7 +156,11 @@ export function BirthdayList() {
                         } ${isNextBirthday ? 'font-bold text-blue-800' : ''}`}
                       >
                         {name}
+                        {isTodaysBirthday && (
+                          <span class="mx-2 text-xl"> 🎂 </span>
+                        )}
                       </dd>
+
                       <button
                         onClick={() => handleDelete(name)}
                         className="text-red-600 size-10 hover:text-red-800"
