@@ -1,19 +1,22 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import AddBirthday from '../components/AddBirthday.astro';
-import { BirthdayList } from '../components/BirthdayList';
-import { BackupControls } from '../components/BackupControls';
-
+import Layout from '../layouts/Layout.astro'
+import AddBirthday from '../components/AddBirthday.astro'
+import { BirthdayList } from '../components/BirthdayList'
+import { BackupControls } from '../components/BackupControls'
 ---
 
 <Layout title="Birthday Tracker">
-  <main class="container mx-auto px-4 py-8" id="mainContent">
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-2xl font-semibold">Birthdays</h2>
+  <main class="container mx-auto px-4 py-8 flex flex-col min-h-screen">
+    <div class="flex flex-col items-center mb-8">
+      <h2 class="text-2xl font-semibold text-center mb-4">
+        🧘 Birthday Sanity 🧘
+      </h2>
+      <p class="mb-4">A simple app to track birthdays.</p>
       <AddBirthday />
     </div>
 
-    <BirthdayList client:load />
-    <BackupControls client:load />
-    </main>
+    <div class="flex-grow">
+      <BirthdayList client:load />
+    </div>
+  </main>
 </Layout>
