@@ -13,3 +13,5 @@ A single source of truth for birthdays, namedays, and other events that you pref
 - [ ] the modal should still allow you to see a little bit of the background
 - [ ] I should be able to drag the json file onto the screen and it will just add the birthdays
 - [ ] I should be able to change the title from "Birthday Sanity" to whatever I want it to be (it will keep it in local Storage)
+- [ ] add a bit of text at the very top that says "It's X's birthday"
+- [ ] Birthday list Item should probably be its own components
