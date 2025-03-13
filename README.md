@@ -6,6 +6,7 @@ A single source of truth for birthdays, namedays, and other events that you pref
 ## To do
 
 - [x] improve padding in Add Birthday component
+- [ ] move to real domain from hashed
 - [ ] refactor AddBirthdayComponent into a React component
 - [ ] allow user to edit birthday names and dates
 - [ ] when I restore from file I should get message saying "restored" and redirect to the homepage
