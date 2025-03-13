@@ -18,12 +18,14 @@ type GroupedBirthdays = {
 
 export function BirthdayList() {
   const [birthdays, setBirthdays] = useState<BirthdayMap>({})
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     const stored = localStorage.getItem('birthdays')
     if (stored) {
       setBirthdays(JSON.parse(stored))
     }
+    setIsLoading(false) // Mark loading as complete
   }, [])
 
   const handleDelete = (name: string) => {
@@ -186,10 +188,16 @@ export function BirthdayList() {
           )
         })}
 
-      {Object.keys(groupedBirthdays).length === 0 && (
+      {/* Only show "No birthdays" when not loading AND there are no birthdays */}
+      {!isLoading && Object.keys(groupedBirthdays).length === 0 && (
         <div className="text-center py-8 text-gray-500">
           No birthdays added yet. Add your first one!
         </div>
+      )}
+
+      {/* Optional: Show loading state */}
+      {isLoading && (
+        <div className="text-center py-8 text-gray-500">Loading...</div>
       )}
     </div>
   )
