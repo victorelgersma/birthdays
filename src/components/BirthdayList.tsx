@@ -135,9 +135,8 @@ export function BirthdayList() {
                             ? 'bg-green-100 border-l-4 border-green-500 pl-2'
                             : ''
                         }
-                        ${isNextBirthday ? 'bg-blue-50' : ''}
                         ${
-                          isCurrentMonth && !isTodaysBirthday && !isNextBirthday
+                          isCurrentMonth && !isTodaysBirthday
                             ? 'hover:bg-blue-50'
                             : 'hover:bg-gray-50'
                         }
@@ -153,14 +152,18 @@ export function BirthdayList() {
                       <dd
                         className={`flex-grow ${
                           isTodaysBirthday ? 'font-bold text-green-800' : ''
-                        } ${isNextBirthday ? 'font-bold text-blue-800' : ''}`}
+                        }`}
                       >
                         {name}
                         {isTodaysBirthday && (
-                          <span class="mx-2 text-xl"> 🎂 </span>
+                          <span className="mx-2 text-xl"> 🎂 </span>
                         )}
                       </dd>
-
+                      {isNextBirthday && (
+                        <span className="mx-4 text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
+                          up next
+                        </span>
+                      )}
                       <button
                         onClick={() => handleDelete(name)}
                         className="text-red-600 size-10 hover:text-red-800"
