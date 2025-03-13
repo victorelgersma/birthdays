@@ -16,3 +16,4 @@ A single source of truth for birthdays, namedays, and other events that you pref
 - [ ] add a bit of text at the very top that says "It's X's birthday"
 - [ ] Birthday list Item should probably be its own components
 - [ ] jank: sometimes there are literally no birthdays - but sometimes it's just slow - need to implement a loading state to prevent showing "no birthdays" when it's just in a loading state
+- [ ] command + enter should save
