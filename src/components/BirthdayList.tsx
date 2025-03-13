@@ -135,11 +135,6 @@ export function BirthdayList() {
                             ? 'bg-green-100 border-l-4 border-green-500 pl-2'
                             : ''
                         }
-                        ${
-                          isCurrentMonth && !isTodaysBirthday
-                            ? 'hover:bg-blue-50'
-                            : 'hover:bg-gray-50'
-                        }
                       `}
                     >
                       <dt
@@ -166,7 +161,7 @@ export function BirthdayList() {
                       )}
                       <button
                         onClick={() => handleDelete(name)}
-                        className="text-red-600 size-10 hover:text-red-800"
+                        className="text-red-600 size-10"
                         aria-label={`Delete ${name}'s birthday`}
                       >
                         <svg
