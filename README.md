@@ -2,7 +2,10 @@
 
 A single source of truth for birthdays, namedays, and other events that you prefer not to put in your calendar for whatever reason 
 
+## data structure and storage
 
+* birthdays are stored in localStorage as an object, where the key represents the name
+* this introduces the subtletly that you cant have two John Smiths with different birthdays.
 ## To do
 
 - [x] improve padding in Add Birthday component
