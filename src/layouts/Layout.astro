@@ -30,17 +30,17 @@ const menuItems = [
     <title>{title}</title>
   </head>
   <body class="min-h-screen bg-gray-50">
-    <!-- Drawer Backdrop -->
+    <!-- Drawer Backdrop - only for small screens -->
     <div
       id="drawerBackdrop"
-      class="fixed inset-0 bg-gray-900/30 backdrop-blur-sm z-20 hidden transition-all"
+      class="md:hidden fixed inset-0 bg-gray-900/30 backdrop-blur-sm z-20 hidden transition-all"
     >
     </div>
 
-    <!-- Drawer -->
+    <!-- Drawer - only for small screens -->
     <div
       id="drawer"
-      class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-30"
+      class="md:hidden fixed inset-y-0 left-0 w-64 bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-30"
     >
       <div class="p-5">
         <div class="flex justify-between items-center mb-6">
@@ -98,12 +98,16 @@ const menuItems = [
       </div>
     </div>
 
-    <!-- Header with hamburger menu -->
+    <!-- Header with responsive navigation -->
     <header class="bg-white shadow-sm">
       <div
         class="container mx-auto px-4 py-3 flex justify-between items-center"
       >
-        <button id="openDrawer" class="p-1 rounded-full hover:bg-gray-100">
+        <!-- Mobile hamburger - hidden on md+ screens -->
+        <button
+          id="openDrawer"
+          class="md:hidden p-1 rounded-full hover:bg-gray-100"
+        >
           <svg
             class="w-6 h-6 text-gray-600"
             fill="none"
@@ -117,9 +121,39 @@ const menuItems = [
               d="M4 6h16M4 12h16M4 18h16"></path>
           </svg>
         </button>
-        <div class="font-medium text-lg text-blue-600">{title}</div>
-        <div class="w-6"></div>
-        <!-- Placeholder for balance -->
+
+        <!-- Logo/Title -->
+        <div class="font-medium text-lg text-blue-600">
+          <a href="/" class="flex items-center">
+            {title}
+          </a>
+        </div>
+
+        <!-- Desktop navbar - hidden on small screens, visible on md+ -->
+        <nav class="hidden md:block">
+          <ul class="flex space-x-6">
+            {
+              menuItems.map((item) => (
+                <li>
+                  <a
+                    href={item.url}
+                    class:list={[
+                      'block py-1 px-2 rounded transition-colors',
+                      Astro.url.pathname === item.url
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'hover:bg-blue-50 text-gray-700 hover:text-blue-600',
+                    ]}
+                  >
+                    {item.title}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </nav>
+
+        <!-- Placeholder for mobile - hidden on md+ screens -->
+        <div class="w-6 md:hidden"></div>
       </div>
     </header>
 
@@ -129,52 +163,55 @@ const menuItems = [
     </div>
 
     <script>
-      // Drawer functionality
+      // Drawer functionality - only needed for mobile
       const drawer = document.getElementById('drawer')
       const drawerBackdrop = document.getElementById('drawerBackdrop')
       const openDrawerBtn = document.getElementById('openDrawer')
       const closeDrawerBtn = document.getElementById('closeDrawer')
 
-      // Open drawer
-      openDrawerBtn.addEventListener('click', () => {
-        drawer.classList.remove('-translate-x-full')
-        drawerBackdrop.classList.remove('hidden')
-        document.body.classList.add('overflow-hidden')
-      })
-
-      // Close drawer function
-      function closeDrawer() {
-        drawer.classList.add('-translate-x-full')
-        drawerBackdrop.classList.add('hidden')
-        document.body.classList.remove('overflow-hidden')
-      }
-
-      // Close drawer with button
-      closeDrawerBtn.addEventListener('click', closeDrawer)
-
-      // Close drawer when clicking outside
-      drawerBackdrop.addEventListener('click', closeDrawer)
-
-      // Add a touch event listener to enable swipe to open drawer
-      let touchStartX = 0
-      document.addEventListener('touchstart', (e) => {
-        touchStartX = e.changedTouches[0].screenX
-      })
-      document.addEventListener('touchend', (e) => {
-        const touchEndX = e.changedTouches[0].screenX
-        const diff = touchEndX - touchStartX
-        if (diff > 100) {
-          // Right swipe
+      // Only set up drawer if elements exist (they won't be interactive on desktop)
+      if (drawer && drawerBackdrop && openDrawerBtn && closeDrawerBtn) {
+        // Open drawer
+        openDrawerBtn.addEventListener('click', () => {
           drawer.classList.remove('-translate-x-full')
           drawerBackdrop.classList.remove('hidden')
-        } else if (
-          diff < -100 &&
-          !drawer.classList.contains('-translate-x-full')
-        ) {
-          // Left swipe
-          closeDrawer()
+          document.body.classList.add('overflow-hidden')
+        })
+
+        // Close drawer function
+        function closeDrawer() {
+          drawer.classList.add('-translate-x-full')
+          drawerBackdrop.classList.add('hidden')
+          document.body.classList.remove('overflow-hidden')
         }
-      })
+
+        // Close drawer with button
+        closeDrawerBtn.addEventListener('click', closeDrawer)
+
+        // Close drawer when clicking outside
+        drawerBackdrop.addEventListener('click', closeDrawer)
+
+        // Add a touch event listener to enable swipe to open drawer
+        let touchStartX = 0
+        document.addEventListener('touchstart', (e) => {
+          touchStartX = e.changedTouches[0].screenX
+        })
+        document.addEventListener('touchend', (e) => {
+          const touchEndX = e.changedTouches[0].screenX
+          const diff = touchEndX - touchStartX
+          if (diff > 100) {
+            // Right swipe
+            drawer.classList.remove('-translate-x-full')
+            drawerBackdrop.classList.remove('hidden')
+          } else if (
+            diff < -100 &&
+            !drawer.classList.contains('-translate-x-full')
+          ) {
+            // Left swipe
+            closeDrawer()
+          }
+        })
+      }
     </script>
   </body>
 </html>
