@@ -9,8 +9,16 @@ const { title } = Astro.props
 
 // Menu items
 const menuItems = [
-  { title: 'Home', url: '/' },
-  { title: 'Backup & Restore', url: '/backup' },
+  {
+    title: 'Home',
+    url: '/',
+    icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
+  },
+  {
+    title: 'Import & Export',
+    url: '/backup',
+    icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12',
+  },
 ]
 ---
 
@@ -60,8 +68,26 @@ const menuItems = [
                 <li>
                   <a
                     href={item.url}
-                    class="block py-2 px-4 rounded hover:bg-blue-50 text-gray-700 hover:text-blue-600 transition-colors"
+                    class:list={[
+                      'block py-2 px-4 rounded transition-colors',
+                      Astro.url.pathname === item.url
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'hover:bg-blue-50 text-gray-700 hover:text-blue-600',
+                    ]}
                   >
+                    <svg
+                      class="w-6 h-6 inline-block mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d={item.icon}
+                      />
+                    </svg>
                     {item.title}
                   </a>
                 </li>
@@ -128,6 +154,27 @@ const menuItems = [
 
       // Close drawer when clicking outside
       drawerBackdrop.addEventListener('click', closeDrawer)
+
+      // Add a touch event listener to enable swipe to open drawer
+      let touchStartX = 0
+      document.addEventListener('touchstart', (e) => {
+        touchStartX = e.changedTouches[0].screenX
+      })
+      document.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].screenX
+        const diff = touchEndX - touchStartX
+        if (diff > 100) {
+          // Right swipe
+          drawer.classList.remove('-translate-x-full')
+          drawerBackdrop.classList.remove('hidden')
+        } else if (
+          diff < -100 &&
+          !drawer.classList.contains('-translate-x-full')
+        ) {
+          // Left swipe
+          closeDrawer()
+        }
+      })
     </script>
   </body>
 </html>
