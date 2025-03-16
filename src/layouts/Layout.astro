@@ -1,21 +1,20 @@
 ---
-import "../styles/global.css";
+import '../styles/global.css'
 
 interface Props {
-  title: string;
+  title: string
 }
 
-const { title } = Astro.props;
+const { title } = Astro.props
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>{title}</title>
-  </head>
-  <body class="min-h-screen bg-gray-50">
+  </head><body class="min-h-screen bg-gray-50">
     <slot />
   </body>
 </html>
