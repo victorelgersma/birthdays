@@ -11,13 +11,13 @@
   </button>
 </div>
 
-<!-- Modal -->
+<!-- Modal with glass effect -->
 <div
   id="birthdayModal"
-  class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
+  class="hidden fixed inset-0 bg-gray-900/30 backdrop-blur-sm overflow-y-auto h-full w-full transition-all z-50"
 >
   <div
-    class="relative top-20 mx-auto p-6 border w-96 shadow-lg rounded-md bg-white"
+    class="relative top-20 mx-auto p-6 border w-96 shadow-lg rounded-md bg-white/95 backdrop-blur-sm"
   >
     <div>
       <h3 class="text-lg font-medium mb-5">Add New Birthday</h3>
@@ -118,6 +118,19 @@
   const includeYearCheckbox = document.getElementById('includeYear')
   const yearInput = document.getElementById('yearInput') as HTMLInputElement
 
+  // Function to open modal
+  function openModal() {
+    modal?.classList.remove('hidden')
+    document.body.classList.add('overflow-hidden') // Prevent background scrolling
+  }
+
+  // Function to close modal
+  function closeModal() {
+    modal?.classList.add('hidden')
+    document.body.classList.remove('overflow-hidden') // Re-enable scrolling
+    form?.reset()
+  }
+
   // Toggle year input
   includeYearCheckbox?.addEventListener('change', (e) => {
     if (yearInput) {
@@ -129,20 +142,13 @@
   })
 
   // Modal controls
-  openBtn?.addEventListener('click', () => {
-    modal?.classList.remove('hidden')
-  })
-
-  closeBtn?.addEventListener('click', () => {
-    modal?.classList.add('hidden')
-    form?.reset()
-  })
+  openBtn?.addEventListener('click', openModal)
+  closeBtn?.addEventListener('click', closeModal)
 
   // Close on outside click
   modal?.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.classList.add('hidden')
-      form?.reset()
+      closeModal()
     }
   })
 
@@ -176,8 +182,7 @@
       localStorage.setItem('birthdays', JSON.stringify(birthdays))
 
       // Close modal and reset form
-      modal?.classList.add('hidden')
-      form.reset()
+      closeModal() // Use the function instead of directly adding 'hidden'
 
       // Refresh the page to show new birthday
       // In a more sophisticated app, we'd use events or state management
