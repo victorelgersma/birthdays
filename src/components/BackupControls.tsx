@@ -47,7 +47,12 @@ export function BackupControls() {
       }
 
       localStorage.setItem('birthdays', JSON.stringify(birthdays))
-      window.location.reload()
+
+      // Navigate to home page instead of just reloading
+      window.location.href = '/'
+
+      // Optional: Show a success message
+      alert('Backup restored successfully!')
     } catch (error) {
       console.error('Failed to restore backup:', error)
       alert('Failed to restore backup. Please ensure the file is valid.')
