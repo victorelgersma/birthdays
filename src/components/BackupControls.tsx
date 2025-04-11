@@ -1,8 +1,15 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 export function BackupControls() {
   const [isDragging, setIsDragging] = useState(false)
+  const [hasBirthdays, setHasBirthdays] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    const stored = localStorage.getItem('birthdays')
+    const birthdays = stored ? JSON.parse(stored) : {}
+    setHasBirthdays(Object.keys(birthdays).length > 0)
+  }, [])
 
   const handleDownload = () => {
     try {
@@ -77,26 +84,28 @@ export function BackupControls() {
 
   return (
     <div className="flex flex-col space-y-6 w-full max-w-md mx-auto">
-      {/* Backup button */}
-      <button
-        onClick={handleDownload}
-        className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg shadow-md text-xl font-medium flex flex-col items-center justify-center transition-all transform hover:scale-105 min-h-[150px]"
-      >
-        <svg
-          className="w-16 h-16 mb-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      {/* Backup button - only show if there are birthdays */}
+      {hasBirthdays && (
+        <button
+          onClick={handleDownload}
+          className="bg-green-500 hover:bg-green-600 text-white p-6 rounded-lg shadow-md text-xl font-medium flex flex-col items-center justify-center transition-all transform hover:scale-105 min-h-[150px]"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-          />
-        </svg>
-        Backup to File
-      </button>
+          <svg
+            className="w-16 h-16 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+            />
+          </svg>
+          Backup to File
+        </button>
+      )}
 
       {/* Hidden file input */}
       <input
